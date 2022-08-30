@@ -11,7 +11,9 @@ payload={
   'cmd3': 'unique',
   'value3': '',
   'cmd4': 'sort',
-  'value4': 'asc'
+  'value4': 'asc',
+  'cmd5': 'regexp',
+  'value5': 'images\/\w+\.png'
 }
 
 response = requests.request("POST", url, data=payload)

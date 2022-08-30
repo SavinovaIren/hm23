@@ -1,7 +1,9 @@
 import os
+import re
 
 from flask import Flask, request, jsonify
 from werkzeug.exceptions import BadRequest
+import re
 
 app = Flask(__name__)
 
@@ -9,40 +11,45 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "data")
 
 
-def do_cmd(cmd, value, data):
+def do_cmd(cmd: str, value: str, data: list) -> list:
+
     if cmd == 'filter':
-        result = list(filter(lambda record: value in record, data))
+        return list(filter(lambda record: value in record, data))
     elif cmd == 'map':
         column = int(value)
         if column == 0:
-            result = list(map(lambda record: record.split()[column], data))
+            return list(map(lambda record: record.split()[column], data))
         elif column == 1:
-            result = list(map(lambda record: record.split()[3:5], data))
+            return list(map(lambda record: record.split()[3:5], data))
         elif column == 2:
-            result = list(map(lambda record: " ".join(record.split()[5:]), data))
+            return list(map(lambda record: " ".join(record.split()[5:]), data))
     elif cmd == 'unique':
-        result = list(set(data))
+        return list(set(data))
     elif cmd == 'sort':
-        result = sorted(data, reverse=True)
+        return sorted(data, reverse=True)
+    elif cmd == 'regexp':
+        value = r"\.png$"
+        return list(filter(lambda rec: re.findall(value, rec), data))
     else:
         raise BadRequest
-    return result
 
 
-
-def do_query(params):
+def do_query(params: dict) -> list:
     with open(os.path.join(DATA_DIR, params["file_name"])) as f:
         file_data = f.readlines()
 
     res = file_data
 
     if "cmd1" in params.keys():
-        res = do_cmd(params["cmd1"], params["value1"], res)
+        return do_cmd(params["cmd1"], params["value1"], res)
     if "cmd2" in params.keys():
-        res = do_cmd(params["cmd2"], params["value2"], res)
+        return do_cmd(params["cmd2"], params["value2"], res)
     if "cmd3" in params.keys():
-        res = do_cmd(params["cmd3"], params["value3"], res)
-    return res
+        return do_cmd(params["cmd3"], params["value3"], res)
+    if "cmd4" in params.keys():
+        return do_cmd(params["cmd4"], params["value4"], res)
+    if "cmd5" in params.keys():
+        return do_cmd(params["cmd5"], params["value5"], res)
 
 
 
