@@ -1,5 +1,4 @@
 import os
-import re
 
 from flask import Flask, request, jsonify
 from werkzeug.exceptions import BadRequest
@@ -28,8 +27,8 @@ def do_cmd(cmd: str, value: str, data: list) -> list:
     elif cmd == 'sort':
         return sorted(data, reverse=True)
     elif cmd == 'regexp':
-        value = r"\.png$"
-        return list(filter(lambda rec: re.findall(value, rec), data))
+        png_list = list(filter(lambda rec: re.findall(value, rec), data))
+        return list(map(lambda record: " ".join(record.split()[:9]), png_list))
     else:
         raise BadRequest
 
@@ -37,19 +36,20 @@ def do_cmd(cmd: str, value: str, data: list) -> list:
 def do_query(params: dict) -> list:
     with open(os.path.join(DATA_DIR, params["file_name"])) as f:
         file_data = f.readlines()
-
-    res = file_data
-
-    if "cmd1" in params.keys():
-        return do_cmd(params["cmd1"], params["value1"], res)
-    if "cmd2" in params.keys():
-        return do_cmd(params["cmd2"], params["value2"], res)
-    if "cmd3" in params.keys():
-        return do_cmd(params["cmd3"], params["value3"], res)
-    if "cmd4" in params.keys():
-        return do_cmd(params["cmd4"], params["value4"], res)
-    if "cmd5" in params.keys():
-        return do_cmd(params["cmd5"], params["value5"], res)
+    try:
+       res = file_data
+       if "cmd1" in params.keys():
+           return do_cmd(params["cmd1"], params["value1"], res)
+       if "cmd2" in params.keys():
+           return do_cmd(params["cmd2"], params["value2"], res)
+       if "cmd3" in params.keys():
+           return do_cmd(params["cmd3"], params["value3"], res)
+       if "cmd4" in params.keys():
+           return do_cmd(params["cmd4"], params["value4"], res)
+       if "cmd5" in params.keys():
+           return do_cmd(params["cmd5"], params["value5"], res)
+    except TypeError:
+        raise TypeError
 
 
 
